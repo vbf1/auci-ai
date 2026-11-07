@@ -33,7 +33,8 @@ create policy "company_members_can_read_company"
   for select
   to authenticated
   using (
-    exists (
+    created_by = (select auth.uid())
+    or exists (
       select 1
       from public.company_memberships m
       where m.company_id = companies.id
