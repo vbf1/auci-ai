@@ -32,13 +32,13 @@ Fill `.env` only with the Auci AI project's Supabase URL and publishable key. Ne
 - [x] Login and registration interface
 - [x] Supabase client adapter and session handling
 - [x] Initial multi-tenant SQL design with RLS policies
-- [ ] Dedicated Auci AI Supabase project
-- [ ] Apply and verify database migration
+- [ ] Dedicated Auci AI Supabase project (blocked by the organization's two active Free projects)
+- [ ] Apply and verify the reviewed SQL schema
 - [ ] Company onboarding and membership flow
 - [ ] AI assistant and validated business tools
 - [ ] Android packaging
 
-The login UI is prepared, but authentication is not live until the dedicated Supabase project is connected. The SQL migration is committed but has not been applied to a database. A production build has not yet been run.
+The login UI is prepared, but authentication is not live until a dedicated Auci AI Supabase project is connected. `supabase/schema.sql` is a reviewed initial multi-tenant schema draft with RLS; it has not been applied or tested against a database. The VBF organization is on the Free plan and currently has two active projects, so a new project must not be created until free capacity is available. A production build has not yet been run.
 
 ## Security
 Never put service-role keys or private API keys in browser code. All business operations must be validated server-side against the authenticated user, company tenant, role and confirmation state.
