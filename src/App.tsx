@@ -1,10 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Activity, ArrowUpRight, Bot, Boxes, CalendarDays, ChartNoAxesCombined, CircleHelp, Command, LayoutDashboard, LockKeyhole, Mail, MessageSquareText, Package, Plus, Settings2, ShieldCheck, Users, Wallet, Eye, EyeOff, LogOut } from 'lucide-react'
 import { supabase } from './lib/supabase'
+import DemoWorkspace from './DemoWorkspace'
 
 type AuthMode = 'login' | 'signup'
 
-function AuthScreen() {
+function AuthScreen({ onDemo }: { onDemo: () => void }) {
   const [mode, setMode] = useState<AuthMode>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -53,6 +54,7 @@ function AuthScreen() {
         {message && <div className="auth-alert success">{message}</div>}
         {!configured && <div className="auth-note"><ShieldCheck size={16}/><span>Ambiente em preparação. Nenhum dado será enviado até a conexão segura ser configurada.</span></div>}
         <button className="auth-submit" type="submit" disabled={busy}>{busy ? 'Aguarde...' : mode === 'login' ? 'Entrar na minha conta' : 'Criar minha conta'} <ArrowUpRight size={17}/></button>
+        <button className="demo-entry-button" type="button" onClick={onDemo}>Explorar demonstração sem criar conta</button>
       </form>
       <div className="auth-foot"><ShieldCheck size={14}/> Acesso protegido · Seus dados pertencem à sua empresa</div>
     </section>
@@ -93,6 +95,7 @@ function Dashboard({ email, onSignOut }: { email: string; onSignOut: () => void 
 }
 
 function App() {
+  const [demoMode, setDemoMode] = useState(false)
   const [session, setSession] = useState<{ user: { email?: string } } | null>(null)
   const [checking, setChecking] = useState(Boolean(supabase))
   useEffect(() => {
@@ -108,8 +111,9 @@ function App() {
     if (supabase) await supabase.auth.signOut()
     setSession(null)
   }
+  if (demoMode) return <DemoWorkspace onExit={() => setDemoMode(false)} />
   if (checking) return <div className="loading-screen"><div className="brand-mark"><Bot size={23}/></div><span>Preparando seu espaço seguro...</span></div>
-  if (!session) return <AuthScreen />
+  if (!session) return <AuthScreen onDemo={() => setDemoMode(true)} />
   return <Dashboard email={session.user.email ?? 'Usuário'} onSignOut={signOut}/>
 }
 export default App
