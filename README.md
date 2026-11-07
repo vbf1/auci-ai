@@ -28,6 +28,18 @@ npm run dev
 
 Fill `.env` with the Firebase Web App configuration. Protect all data with Firebase Security Rules. Keep the project on the Spark plan and do not link a billing account.
 
+
+## Firebase setup (owner action required)
+
+1. Open the [Firebase Console](https://console.firebase.google.com/) and create a separate project named **Auci AI**. Keep it on the **Spark** plan; do not add a billing account or switch to Blaze.
+2. In Project Overview, add a **Web app** and copy its configuration values.
+3. Open **Authentication → Sign-in method** and enable **Email/Password**.
+4. In **Authentication → Settings → Authorized domains**, add `vbf1.github.io`.
+5. In the [Auci AI GitHub Actions variables](https://github.com/vbf1/auci-ai/settings/variables/actions), create these repository variables using the values from the Firebase Web App config: `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, and `VITE_FIREBASE_APP_ID`.
+6. Save the variables. GitHub Actions will rebuild and republish the website automatically.
+
+These Web App configuration values are intended for browser use. Do not put a Firebase Admin SDK private key or service-account JSON in repository variables or frontend code. The current step enables account registration/login only; company records and business data still need a Firestore database and restrictive Security Rules in a later step.
+
 ## Current status
 - [x] Repository and initial responsive dashboard
 - [x] Login and registration interface
