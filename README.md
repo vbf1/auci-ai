@@ -34,7 +34,8 @@ Fill `.env` only with the Auci AI project's Supabase URL and publishable key. Ne
 - [x] Initial multi-tenant SQL design with RLS policies
 - [ ] Dedicated Auci AI Supabase project (blocked by the organization's two active Free projects)
 - [ ] Apply and verify the reviewed SQL schema
-- [x] Local demonstration workspace: company setup, employee list, permission matrix and simulated assistant chat (session-only data)\n- [ ] Company onboarding and membership flow
+- [x] Local demonstration workspace: company setup, employee list, permission matrix and simulated assistant chat (session-only data)
+- [ ] Company onboarding and membership flow
 - [ ] AI assistant and validated business tools
 - [ ] Android packaging
 
