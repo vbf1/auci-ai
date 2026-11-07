@@ -12,7 +12,8 @@
     "react": "latest",
     "react-dom": "latest",
     "lucide-react": "latest",
-    "@supabase/supabase-js": "2.119.0"
+    "@supabase/supabase-js": "2.119.0",
+    "firebase": "13.2.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "latest",
