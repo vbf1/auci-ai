@@ -32,7 +32,8 @@ grant select, insert on public.company_memberships to authenticated;
 
 create policy "members can read their companies" on public.companies
   for select to authenticated using (
-    exists (select 1 from public.company_memberships m
+    owner_id = (select auth.uid())
+    or exists (select 1 from public.company_memberships m
       where m.company_id = companies.id and m.user_id = (select auth.uid()))
   );
 
