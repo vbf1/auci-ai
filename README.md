@@ -38,9 +38,9 @@ Fill `.env` only with the Auci AI project's Supabase URL and publishable key. Ne
 - [ ] Company onboarding and membership flow
 - [ ] AI assistant and validated business tools
 - [ ] Android packaging
-- [x] GitHub Actions workflow to validate TypeScript and build the web app on pushes and pull requests
+- [x] GitHub Actions workflow to validate TypeScript/build and publish the web app to GitHub Pages on pushes to main
 
-The login UI is prepared, but authentication is not live until a dedicated Auci AI Supabase project is connected. The "Explorar demonstração" entry opens a local-only workspace to preview navigation and onboarding; its temporary data is not persisted, does not send invitations, does not call an AI model, and does not execute business operations. `supabase/schema.sql` is a reviewed initial multi-tenant schema draft with RLS; it has not been applied or tested against a database. The VBF organization is on the Free plan and currently has two active projects, so a new project must not be created until free capacity is available. A production build has not yet been run.
+The login UI is prepared, but authentication is not live until a dedicated Auci AI Supabase project is connected. The "Explorar demonstração" entry opens a local-only workspace to preview navigation and onboarding; its temporary data is not persisted, does not send invitations, does not call an AI model, and does not execute business operations. `supabase/schema.sql` is a reviewed initial multi-tenant schema draft with RLS; it has not been applied or tested against a database. The VBF organization is on the Free plan and currently has two active projects, so a new project must not be created until free capacity is available. The latest production build completed successfully in GitHub Actions. GitHub Pages publication runs automatically after a successful build on pushes to main; the first deployment must complete before the public URL is available.
 
 ## Security
 Never put service-role keys or private API keys in browser code. All business operations must be validated server-side against the authenticated user, company tenant, role and confirmation state.
