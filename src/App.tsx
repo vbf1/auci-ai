@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Activity, ArrowUpRight, Bot, Boxes, CalendarDays, ChartNoAxesCombined, CircleHelp, Command, LayoutDashboard, LockKeyhole, Mail, MessageSquareText, Package, Plus, Settings2, ShieldCheck, Users, Wallet, Eye, EyeOff, LogOut } from 'lucide-react'
-import { supabase } from './lib/supabase'
+import { auth } from './lib/firebase'
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut as firebaseSignOut } from 'firebase/auth'
 import DemoWorkspace from './DemoWorkspace'
 
 type AuthMode = 'login' | 'signup'
@@ -13,29 +14,38 @@ function AuthScreen({ onDemo }: { onDemo: () => void }) {
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
-  const configured = Boolean(supabase)
+  const configured = Boolean(auth)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setMessage('')
     setError('')
-    if (!supabase) {
-      setError('A conexão segura ainda não foi configurada. O próximo passo é conectar o projeto Auci AI ao Supabase.')
+    if (!auth) {
+      setError('A conexão com o Firebase ainda não foi configurada. Siga as instruções de configuração do Auci AI.')
       return
     }
     setBusy(true)
     try {
       if (mode === 'signup') {
-        const { data, error: authError } = await supabase.auth.signUp({ email: email.trim(), password })
-        if (authError) throw authError
-        if (!data.session) setMessage('Cadastro iniciado! Verifique seu e-mail para confirmar a conta e depois entre no Auci AI.')
-        else setMessage('Conta criada com sucesso. Vamos preparar sua empresa.')
+        await createUserWithEmailAndPassword(auth, email.trim(), password)
+        setMessage('Conta criada com sucesso. Agora vamos preparar sua empresa.')
       } else {
-        const { error: authError } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
-        if (authError) throw authError
+        await signInWithEmailAndPassword(auth, email.trim(), password)
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Não foi possível concluir. Tente novamente.')
+      const code = typeof err === 'object' && err && 'code' in err ? String(err.code) : ''
+      const friendlyErrors: Record<string, string> = {
+        'auth/email-already-in-use': 'Este e-mail já possui uma conta. Entre ou use outro e-mail.',
+        'auth/invalid-email': 'Digite um endereço de e-mail válido.',
+        'auth/weak-password': 'A senha é muito fraca. Use pelo menos 8 caracteres.',
+        'auth/invalid-credential': 'E-mail ou senha incorretos.',
+        'auth/user-not-found': 'Não encontramos uma conta com esse e-mail.',
+        'auth/wrong-password': 'Senha incorreta. Confira e tente novamente.',
+        'auth/too-many-requests': 'Muitas tentativas. Aguarde um pouco e tente novamente.',
+        'auth/network-request-failed': 'Falha de conexão. Verifique sua internet e tente novamente.',
+        'auth/operation-not-allowed': 'O acesso por e-mail e senha ainda não foi ativado no Firebase.'
+      }
+      setError(friendlyErrors[code] ?? (err instanceof Error ? err.message : 'Não foi possível concluir. Tente novamente.'))
     } finally {
       setBusy(false)
     }
@@ -97,18 +107,16 @@ function Dashboard({ email, onSignOut }: { email: string; onSignOut: () => void 
 function App() {
   const [demoMode, setDemoMode] = useState(false)
   const [session, setSession] = useState<{ user: { email?: string } } | null>(null)
-  const [checking, setChecking] = useState(Boolean(supabase))
+  const [checking, setChecking] = useState(Boolean(auth))
   useEffect(() => {
-    if (!supabase) return
-    let alive = true
-    supabase.auth.getSession().then(({ data }) => {
-      if (alive) { setSession(data.session); setChecking(false) }
+    if (!auth) return
+    return onAuthStateChanged(auth, (user) => {
+      setSession(user ? { user: { email: user.email ?? undefined } } : null)
+      setChecking(false)
     })
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession))
-    return () => { alive = false; listener.subscription.unsubscribe() }
   }, [])
   async function signOut() {
-    if (supabase) await supabase.auth.signOut()
+    if (auth) await firebaseSignOut(auth)
     setSession(null)
   }
   if (demoMode) return <DemoWorkspace onExit={() => setDemoMode(false)} />
